@@ -20,7 +20,6 @@ void testApp::setup(){
 void testApp::update(){
     if ( bRecord )
     {
-        serializer.clear();
         serializer.add(MsgPackMyClass(mouseX, mouseY));
     }
     else if ( bPlay )
