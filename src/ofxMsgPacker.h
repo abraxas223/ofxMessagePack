@@ -20,7 +20,7 @@ public:
     msgpack::sbuffer sbuff;
     msgpack::packer<msgpack::sbuffer> * pkr;
     
-    FILE * f = NULL;
+    FILE * file = NULL;
     
     void setup()
     {
@@ -30,30 +30,31 @@ public:
     
     void openFile( string filename )
     {
-        f = fopen(ofToDataPath(filename).c_str(),"wb");
+        file = fopen(ofToDataPath(filename).c_str(),"wb");
     }
     
     void closeFile()
     {
-        if ( f != NULL )
+        if ( file != NULL )
         {
-            fclose(f);
-            f = NULL;
+            fclose(file);
+            file = NULL;
         }
     }
     
     void add( const T data )
     {
+        if ( file != NULL )clear();
         if ( pkr != NULL) pkr->pack( data );
         else
         {
             ofLogError() << "please call ofxMsgPacker::setup";
         }
         size_t dSize = size();
-        if ( f != NULL )
+        if ( file != NULL ) //write to file
         {
-            fwrite( &dSize, sizeof(size_t), 1, f);
-            fwrite( sbuff.data(), size(), 1, f);
+            fwrite( &dSize, sizeof(size_t), 1, file);
+            fwrite( sbuff.data(), size(), 1, file);
         }
     }
     

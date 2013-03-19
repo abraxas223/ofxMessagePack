@@ -18,7 +18,7 @@ public:
     msgpack::unpacked unpacked;
     msgpack::unpacker unpakr;
     
-    FILE * f = NULL;
+    FILE * file = NULL;
     bool bLoopFile = true;
     bool bBufferEnd = false;
     
@@ -42,19 +42,19 @@ public:
     void updateFile()
     {
         size_t size = 0;
-        fread(&size, sizeof(size_t),1,f);
+        fread(&size, sizeof(size_t),1,file);
         if ( size > 0)
         {
             char *buf = new char[size];
-            fread(buf, size,1, f);
+            fread(buf, size,1, file);
             deserialize(buf, size);
             
         }
         if ( bLoopFile )
         {
-            if (feof(f) != 0)
+            if (feof(file) != 0)
             {
-                fseek(f, 0, SEEK_SET);
+                fseek(file, 0, SEEK_SET);
             }
         }
     }
@@ -67,13 +67,17 @@ public:
     
     void openFile( string filename )
     {
-        f = fopen(ofToDataPath(filename).c_str(), "rb");
+        file = fopen(ofToDataPath(filename, true).c_str(), "rb");
+        if ( file == NULL)
+        {
+            ofLogError() << "cannot open file:" + ofToDataPath(filename, true);
+        }
     }
     
     void close()
     {
-        if ( f != NULL) fclose(f);
-        f = NULL;
+        if ( file != NULL) fclose(file);
+        file = NULL;
     }
     
 private:
